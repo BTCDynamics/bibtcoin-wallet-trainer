@@ -342,57 +342,64 @@ TEMPLATE = """
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1b1b1b, #3a2a10);
-            color: #222;
+            background:
+                radial-gradient(circle at top left, rgba(247,147,26,0.18), transparent 34%),
+                radial-gradient(circle at top right, rgba(77,163,255,0.16), transparent 30%),
+                linear-gradient(135deg, #05070a, #101820 55%, #0b0f14);
+            color: #e5e7eb;
         }
         .page {
-            max-width: 980px;
+            max-width: 1120px;
             margin: 0 auto;
-            padding: 22px 14px 40px;
+            padding: 28px 18px 44px;
         }
         .header {
             color: white;
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 22px;
         }
-        .header h1 { margin: 0; }
-        .header p { color: #ddd; }
+        .header h1 { margin: 0; font-size: 36px; letter-spacing: -0.5px; }
+        .header p { color: #cbd5e1; font-size: 17px; }
         .notice {
-            background: #fff3cd;
-            border: 1px solid #ffe69c;
+            background: rgba(255, 243, 205, 0.95);
+            border: 1px solid rgba(255, 230, 156, 0.9);
             padding: 12px;
-            border-radius: 14px;
+            border-radius: 16px;
             margin-bottom: 16px;
             text-align: center;
+            color: #111;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.20);
         }
         .guide-bar {
             position: sticky;
             top: 10px;
             z-index: 1000;
-            background: #86efac;
-            color: #0f172a;
-            padding: 12px;
-            border-radius: 14px;
-            margin: 0 0 14px;
+            background: linear-gradient(135deg, #86efac, #bbf7d0);
+            color: #052e16;
+            padding: 14px 16px;
+            border-radius: 18px;
+            margin: 0 0 18px;
             font-weight: bold;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.18);
-            border: 1px solid #93c5fd;
+            box-shadow: 0 14px 35px rgba(0,0,0,0.30);
+            border: 1px solid rgba(134,239,172,0.95);
         }
         .education-box {
-            background: #eef6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 16px;
-            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(134,239,172,0.45);
+            border-radius: 20px;
+            padding: 16px 18px;
             margin: 0 0 18px;
-            color: #111827;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+            color: #e5e7eb;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.26);
+            backdrop-filter: blur(8px);
         }
         .education-box summary {
             cursor: pointer;
             font-weight: bold;
             font-size: 18px;
             list-style-position: inside;
+            color: #86efac;
         }
         .education-box summary::-webkit-details-marker {
             margin-right: 6px;
@@ -414,32 +421,35 @@ TEMPLATE = """
         }
         .flash {
             padding: 12px;
-            border-radius: 14px;
-            margin-bottom: 10px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            color: #111;
         }
         .success { background: #d1e7dd; }
         .error { background: #f8d7da; }
         .phones {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 26px;
+            align-items: start;
         }
         .phone {
-            background: #f6f6f6;
-            border: 8px solid #111;
-            border-radius: 34px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-        }
-        .topbar {
-            background: #111;
-            color: white;
-            text-align: center;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 28px;
+            overflow: visible;
+            box-shadow: 0 22px 70px rgba(0,0,0,0.45);
             padding: 18px;
         }
-        .topbar h2 { margin: 0; }
-        .topbar p { color: #ccc; font-size: 13px; }
-        .content { padding: 18px; }
+        .topbar {
+            background: transparent;
+            color: white;
+            text-align: left;
+            padding: 0 0 14px;
+        }
+        .topbar h2 { margin: 0; font-size: 25px; letter-spacing: -0.3px; }
+        .topbar p { color: #94a3b8; font-size: 13px; }
+        .content { padding: 0; }
         .wallet-card.highlight {
             animation: flashGlow 3s ease;
         }
@@ -452,14 +462,15 @@ TEMPLATE = """
         }
         .wallet-card {
             position: relative;
-            border-radius: 24px;
+            border-radius: 26px;
             overflow: hidden;
-            padding: 20px;
+            padding: 22px;
             color: #111;
             background: linear-gradient(160deg, #f7931a, #ffbd63);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28), 0 18px 34px rgba(0,0,0,0.28);
         }
         .wallet-card.send {
-            background: linear-gradient(160deg, #4da3ff, #9dccff);
+            background: linear-gradient(160deg, #1479e8, #7cc2ff);
         }
         .incoming {
             background: rgba(255,255,255,.85);
@@ -502,11 +513,12 @@ TEMPLATE = """
             100% { box-shadow: 0 0 0 0 rgba(247,147,26,0); }
         }
         .wallet-name {
-            font-size: 26px;
+            font-size: 34px;
             font-weight: bold;
-            background: rgba(255,255,255,.75);
-            padding: 12px;
-            border-radius: 14px;
+            background: rgba(255,255,255,.78);
+            padding: 18px;
+            border-radius: 20px;
+            margin-top: 8px;
         }
         .label {
             font-size: 13px;
@@ -519,34 +531,43 @@ TEMPLATE = """
             opacity: .75;
         }
         .balance {
-            font-size: 36px;
-            font-weight: 800;
+            font-size: 44px;
+            font-weight: 900;
             margin-top: 4px;
+            letter-spacing: -1px;
         }
         .actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 14px;
             margin: 18px 0;
         }
         button {
             border: none;
-            border-radius: 16px;
-            padding: 13px;
+            border-radius: 18px;
+            padding: 14px;
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
-            background: #111;
+            background: #111827;
             color: white;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-        .orange { background: #f7931a; color: #111; }
-        .blue { background: #4da3ff; color: #111; }
-        .light { background: #e7e7e7; color: #111; }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+        }
+        .orange { background: linear-gradient(135deg, #f7931a, #ffae35); color: #111; }
+        .blue { background: linear-gradient(135deg, #1479e8, #4da3ff); color: white; }
+        .light { background: rgba(255,255,255,0.92); color: #111; }
         .panel {
-            background: white;
+            background: rgba(255,255,255,0.96);
             border-radius: 22px;
             padding: 16px;
             margin-top: 14px;
+            color: #111;
+            box-shadow: 0 14px 32px rgba(0,0,0,0.18);
         }
         .hidden { display: none; }
         .address-box {
@@ -589,13 +610,17 @@ TEMPLATE = """
         }
         .row input { flex: 1; min-width: 0; }
         .activity {
-            background: #f6f6f6;
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(255,255,255,0.10);
             border-radius: 24px;
-            padding: 18px;
+            padding: 20px;
             margin-top: 24px;
+            color: #e5e7eb;
+            box-shadow: 0 18px 44px rgba(0,0,0,0.32);
         }
         .tx-item {
-            background: white;
+            background: rgba(255,255,255,0.96);
+            color: #111;
             border-radius: 16px;
             padding: 12px;
             margin-bottom: 10px;
@@ -629,10 +654,12 @@ TEMPLATE = """
         }
         .modal {
             background: white;
+            color: #111;
             padding: 24px;
-            border-radius: 20px;
+            border-radius: 24px;
             max-width: 340px;
             text-align: center;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.35);
         }
         .modal .txid-small {
             font-size: 11px;
@@ -697,7 +724,7 @@ TEMPLATE = """
         <div class="phone">
             <div class="topbar">
                 <h2>Erica's Wallet</h2>
-                <p></p>
+                <p>Practice receiving and sending sats</p>
             </div>
             <div class="content">
                 <div class="wallet-card {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}highlight{% endif %}" id="ericaWallet">
@@ -761,7 +788,7 @@ TEMPLATE = """
         <div class="phone">
             <div class="topbar">
                 <h2>Neil's Wallet</h2>
-                <p></p>
+                <p>Practice sending and receiving sats</p>
             </div>
             <div class="content">
                 <div class="wallet-card send" id="neilWallet">
@@ -824,8 +851,8 @@ TEMPLATE = """
 
 
     <form method="post" action="{{ url_for('reset') }}" style="text-align:center; margin:24px 0;">
-        <button class="light" style="padding:14px 28px; font-size:16px;">
-            Reset Training Wallets
+        <button class="light" style="padding:15px 34px; font-size:17px; border:1px solid rgba(255,255,255,0.25);">
+            ↻ Reset Training Wallets
         </button>
     </form>
 
