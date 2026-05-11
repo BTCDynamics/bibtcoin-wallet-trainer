@@ -132,6 +132,22 @@ def load_page(sent_tx=None):
     )
 
 
+
+def ensure_db_ready():
+    try:
+        conn = get_db()
+        conn.execute("SELECT 1 FROM transactions LIMIT 1")
+        conn.close()
+    except sqlite3.OperationalError:
+        init_db()
+
+
+@app.before_request
+def before_request():
+    ensure_db_ready()
+
+
+
 @app.route("/")
 def index():
     return load_page(sent_tx=None)
@@ -1105,6 +1121,5 @@ setTimeout(() => {
 
 
 if __name__ == "__main__":
-    if not DB_PATH.exists():
-        init_db()
+    init_db()
     app.run(host="127.0.0.1", port=5000, debug=True)
