@@ -369,7 +369,7 @@ TEMPLATE = """
             position: sticky;
             top: 10px;
             z-index: 1000;
-            background: #86efac;
+            background: #f7931a;
             color: #0f172a;
             padding: 12px;
             border-radius: 14px;
@@ -671,6 +671,7 @@ TEMPLATE = """
     <details class="education-box" open>
         <summary>How Bitcoin Transactions Work</summary>
         <p>Sending Bitcoin is similar to mailing a letter: before you can send it, you need the receiver's address.</p>
+        <p>In the real world, the receiver usually shares their receive address by text message, email, QR code, or messaging app.</p>
         <p>In this trainer, you have the wallet create a receive address, then paste that address into the other wallet, enter an amount, and sends sats.</p>
         <ul>
             <li>The receive address tells the wallet where to send the sats.</li>
@@ -744,7 +745,7 @@ TEMPLATE = """
 
                 <div class="panel hidden" id="receivePanel">
                     <h3>Receive Sats</h3>
-                    <p>Copy Erica's address (QR code shown for realism).</p>
+                    <p>Copy Erica's address to share with Neil (QR code shown for realism).</p>
                     <div class="address-box" id="ericaAddress">{{ erica.address }}</div>
                     <button id="copyBtn" class="orange" style="width:100%; margin-bottom:12px;" onclick="copyAddress()">Copy Receive Address</button>
                     <div class="qr-box">
@@ -818,12 +819,6 @@ TEMPLATE = """
         </div>
     </div>
 
-    <form method="post" action="{{ url_for('reset') }}" style="text-align:center; margin:24px 0;">
-        <button class="light" style="padding:14px 28px; font-size:16px;">
-            Reset Training Wallets
-        </button>
-    </form>
-
     <div class="activity">
         <h2>Recent Activity</h2>
         {% for tx in transactions %}
@@ -839,6 +834,9 @@ TEMPLATE = """
             <p>No transactions yet.</p>
         {% endfor %}
 
+        <form method="post" action="{{ url_for('reset') }}">
+            <button class="light" style="width:100%;">Reset Training Wallets</button>
+        </form>
     </div>
 </div>
 
@@ -933,7 +931,7 @@ function showReceive() {
     hideEricaPanels();
     const receivePanel = document.getElementById('receivePanel');
     if (receivePanel) receivePanel.classList.remove('hidden');
-    advanceGuide("Step 2: Copy Erica's address");
+    advanceGuide("Step 2: Copy Erica's address to share with Neil");
     highlightCopy();
 }
 
@@ -947,7 +945,7 @@ function showSend() {
     hideNeilPanels();
     const sendPanel = document.getElementById('sendPanel');
     if (sendPanel) sendPanel.classList.remove('hidden');
-    advanceGuide("Step 3: Paste Erica's address");
+    advanceGuide("Step 3: Neil pastes Erica's shared address");
     highlightPaste();
 }
 
@@ -1118,15 +1116,6 @@ setTimeout(() => {
 }, 800);
 {% endif %}
 </script>
-<footer style="
-    text-align:center;
-    padding:20px;
-    margin-top:30px;
-    font-size:13px;
-    color:#bbb;
-">
-    ⚡ Training simulator only — no real Bitcoin is stored or transferred.
-</footer>
 </body>
 </html>
 """
