@@ -818,6 +818,12 @@ TEMPLATE = """
         </div>
     </div>
 
+    <form method="post" action="{{ url_for('reset') }}" style="text-align:center; margin:24px 0;">
+        <button class="light" style="padding:14px 28px; font-size:16px;">
+            Reset Training Wallets
+        </button>
+    </form>
+
     <div class="activity">
         <h2>Recent Activity</h2>
         {% for tx in transactions %}
@@ -833,9 +839,6 @@ TEMPLATE = """
             <p>No transactions yet.</p>
         {% endfor %}
 
-        <form method="post" action="{{ url_for('reset') }}">
-            <button class="light" style="width:100%;">Reset Training Wallets</button>
-        </form>
     </div>
 </div>
 
@@ -1115,6 +1118,15 @@ setTimeout(() => {
 }, 800);
 {% endif %}
 </script>
+<footer style="
+    text-align:center;
+    padding:20px;
+    margin-top:30px;
+    font-size:13px;
+    color:#bbb;
+">
+    ⚡ Training simulator only — no real Bitcoin is stored or transferred.
+</footer>
 </body>
 </html>
 """
