@@ -453,6 +453,7 @@ TEMPLATE = """
         .wallet-card {
             position: relative;
             border-radius: 24px;
+            overflow: hidden;
             padding: 20px;
             color: #111;
             background: linear-gradient(160deg, #f7931a, #ffbd63);
