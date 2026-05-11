@@ -369,7 +369,7 @@ TEMPLATE = """
             position: sticky;
             top: 10px;
             z-index: 1000;
-            background: #f7931a;
+            background: #86efac;
             color: #0f172a;
             padding: 12px;
             border-radius: 14px;
