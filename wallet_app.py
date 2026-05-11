@@ -702,12 +702,12 @@ TEMPLATE = """
         <p>In the real world, the receiver usually shares their receive address by text message, email, QR code, or messaging app.</p>
         <p>In this trainer, you have the wallet create a receive address, then paste that address into the other wallet, enter an amount, and sends sats.</p>
         <ul>
-            <li>The receive address tells the wallet where to send the sats.</li>
+            <li>The receive address tells the sending wallet where to send the sats.</li>
             <li>The transaction starts as pending confirmation.</li>
             <li>Confirmations show the network has accepted the transaction.</li>
         </ul>
 
-        <p>In the real world, people use Bitcoin wallets such as Blockstream Green, Aqua Wallet, Nunchuk, Blitz, and many others to send and receive sats.</p>
+        <p>In the real world, people use Bitcoin wallets such as Blockstream, Aqua Wallet, Nunchuk, Blitz, and many others to send and receive sats.</p>
     </details>
 
     <div id="guide" class="guide-bar">
