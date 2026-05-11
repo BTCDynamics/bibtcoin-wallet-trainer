@@ -678,6 +678,8 @@ TEMPLATE = """
             <li>The transaction starts as pending confirmation.</li>
             <li>Confirmations show the network has accepted the transaction.</li>
         </ul>
+
+        <p>In the real world, people use Bitcoin wallets such as Blockstream Green, Aqua Wallet, Nunchuk, Blitz, and many others to send and receive sats.</p>
     </details>
 
     <div id="guide" class="guide-bar">
