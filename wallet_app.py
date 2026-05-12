@@ -742,7 +742,7 @@ TEMPLATE = """
                     {% endif %}
                     <div class="label">Erica's Wallet</div>
                     <div class="wallet-name">Erica</div>
-                    <div class="balance-label">Available balance</div>
+                    <div class="balance-label">BTC balance</div>
                     <div class="balance">{{ "{:,}".format(erica.balance) }} sats</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats</div>
@@ -806,7 +806,7 @@ TEMPLATE = """
                     {% endif %}
                     <div class="label">Neil's Wallet</div>
                     <div class="wallet-name">Neil</div>
-                    <div class="balance-label">Available balance</div>
+                    <div class="balance-label">BTC balance</div>
                     <div class="balance">{{ "{:,}".format(neil.balance) }} sats</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats</div>
