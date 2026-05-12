@@ -19,6 +19,16 @@ def sats_to_usd(sats):
 def format_usd(sats):
     return f"${sats_to_usd(sats):,.2f}"
 
+
+def sats_to_btc(sats):
+    return sats / SATS_PER_BTC
+
+
+def format_btc(sats):
+    btc = sats_to_btc(sats)
+    text = f"{btc:.8f}".rstrip("0").rstrip(".")
+    return f"{text} BTC"
+
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
 
@@ -140,6 +150,9 @@ def load_page(sent_tx=None):
         latest_neil_tx=latest_neil_tx,
         latest_display_tx=latest_display_tx,
         format_usd=format_usd,
+        format_btc=format_btc,
+        btc_usd_price=BTC_USD_PRICE,
+        sats_per_btc=SATS_PER_BTC,
     )
 
 
@@ -559,6 +572,33 @@ TEMPLATE = """
             font-weight: bold;
             color: #1479e8;
         }
+        .unit-row {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+        select {
+            width: 100%;
+            padding: 13px;
+            font-size: 15px;
+            border-radius: 14px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        .conversion-box {
+            margin-top: 10px;
+            background: #eef6ff;
+            border: 1px solid #cfe7ff;
+            border-radius: 16px;
+            padding: 12px;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #111;
+        }
+        .conversion-box strong {
+            color: #0f5fb8;
+        }
         .actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -757,7 +797,7 @@ TEMPLATE = """
                 <div class="wallet-card {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}highlight{% endif %}" id="ericaWallet">
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
                         <div class="incoming">
-                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats ({{ format_usd(latest_display_tx.amount) }})<br>
+                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats · {{ format_btc(latest_display_tx.amount) }} ({{ format_usd(latest_display_tx.amount) }})<br>
                             <span id="txStatus">
                                 {% if latest_display_tx.status == "confirmed" %}
                                     ✅ Confirmed · {{ latest_display_tx.confirmations }} conf.
@@ -771,7 +811,7 @@ TEMPLATE = """
                     <div class="wallet-name">Erica</div>
                     <div class="balance-label">Total BTC balance</div>
                     <div class="balance">{{ "{:,}".format(erica.balance) }} sats</div>
-                    <div class="dollar-balance">({{ format_usd(erica.balance) }})</div>
+                    <div class="dollar-balance">{{ format_btc(erica.balance) }} ({{ format_usd(erica.balance) }})</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
                     {% endif %}
@@ -792,9 +832,17 @@ TEMPLATE = """
                                 <input id="sendBackAddress" name="receiver_address" placeholder="Paste Neil's receive address" required>
                                 <button type="button" class="light" onclick="pasteNeilAddress()">Paste</button>
                             </div>
-                            <label>Amount in sats</label>
-                            <input id="sendBackAmount" name="amount" type="number" min="1" value="{{ latest_tx.amount }}" required oninput="updateSendBackDollarPreview()">
-                            <div id="sendBackDollarPreview" class="amount-preview">{{ "{:,}".format(latest_tx.amount) }} sats ({{ format_usd(latest_tx.amount) }})</div>
+                            <label>Send amount</label>
+                            <div class="unit-row">
+                                <select id="sendBackUnit" onchange="updateSendBackAmountPreview()">
+                                    <option value="sats" selected>sats</option>
+                                    <option value="btc">BTC</option>
+                                    <option value="usd">USD</option>
+                                </select>
+                                <input id="sendBackAmountDisplay" type="number" min="0" step="any" value="{{ latest_tx.amount }}" required oninput="updateSendBackAmountPreview()">
+                            </div>
+                            <input id="sendBackAmount" name="amount" type="hidden" value="{{ latest_tx.amount }}">
+                            <div id="sendBackConversionPreview" class="conversion-box"></div>
                             <button id="sendBackSubmitBtn" class="orange" style="width:100%; margin-top:14px;" type="submit">Send Back to Neil</button>
                         </form>
                     {% else %}
@@ -823,7 +871,7 @@ TEMPLATE = """
                 <div class="wallet-card send" id="neilWallet">
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
                         <div class="incoming">
-                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats ({{ format_usd(latest_display_tx.amount) }})<br>
+                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats · {{ format_btc(latest_display_tx.amount) }} ({{ format_usd(latest_display_tx.amount) }})<br>
                             <span id="txStatus">
                                 {% if latest_display_tx.status == "confirmed" %}
                                     ✅ Confirmed · {{ latest_display_tx.confirmations }} conf.
@@ -837,7 +885,7 @@ TEMPLATE = """
                     <div class="wallet-name">Neil</div>
                     <div class="balance-label">Total BTC balance</div>
                     <div class="balance">{{ "{:,}".format(neil.balance) }} sats</div>
-                    <div class="dollar-balance">({{ format_usd(neil.balance) }})</div>
+                    <div class="dollar-balance">{{ format_btc(neil.balance) }} ({{ format_usd(neil.balance) }})</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
                     {% endif %}
@@ -867,9 +915,17 @@ TEMPLATE = """
                             <button id="pasteBtn" type="button" class="light" onclick="pasteAddress()">Paste</button>
                         </div>
 
-                        <label>Amount in sats</label>
-                        <input id="amountInput" name="amount" type="number" min="1" placeholder="Example: 5000" required oninput="updateNeilSendDollarPreview()">
-                        <div id="neilDollarPreview" class="amount-preview">Enter sats to see dollar amount</div>
+                        <label>Send amount</label>
+                        <div class="unit-row">
+                            <select id="neilSendUnit" onchange="updateNeilSendAmountPreview()">
+                                <option value="sats" selected>sats</option>
+                                <option value="btc">BTC</option>
+                                <option value="usd">USD</option>
+                            </select>
+                            <input id="amountInputDisplay" type="number" min="0" step="any" placeholder="Example: 5000" required oninput="updateNeilSendAmountPreview()">
+                        </div>
+                        <input id="amountInput" name="amount" type="hidden">
+                        <div id="neilConversionPreview" class="conversion-box">Enter an amount to see sats, BTC, and dollar value.</div>
 
                         <button id="neilSendSubmitBtn" class="blue" style="width:100%; margin-top:14px;" type="submit">
                             Send Fake Transaction
@@ -893,9 +949,9 @@ TEMPLATE = """
             <div class="tx-item">
                 <div class="tx-main">
                     <span>{{ tx.sender_name }} → {{ tx.receiver_name }}</span>
-                    <span>{{ "{:,}".format(tx.amount) }} sats ({{ format_usd(tx.amount) }})</span>
+                    <span>{{ "{:,}".format(tx.amount) }} sats · {{ format_btc(tx.amount) }} ({{ format_usd(tx.amount) }})</span>
                 </div>
-                <div class="tx-sub" id="activityStatus-{{ tx.txid }}">Fee: {{ "{:,}".format(tx.fee) }} sats · {{ tx.status }} · {{ tx.confirmations }} conf.</div>
+                <div class="tx-sub" id="activityStatus-{{ tx.txid }}">Fee: {{ "{:,}".format(tx.fee) }} sats ({{ format_usd(tx.fee) }}) · {{ tx.status }} · {{ tx.confirmations }} conf.</div>
                 <div class="txid">{{ tx.txid }}</div>
             </div>
         {% else %}
@@ -910,9 +966,9 @@ TEMPLATE = """
 <div class="modal-backdrop">
     <div class="modal">
         <h2>Transaction Sent</h2>
-        <p><strong>{{ "{:,}".format(sent_tx.amount) }} sats ({{ format_usd(sent_tx.amount) }})</strong></p>
+        <p><strong>{{ "{:,}".format(sent_tx.amount) }} sats · {{ format_btc(sent_tx.amount) }} ({{ format_usd(sent_tx.amount) }})</strong></p>
         <p>From {{ sent_tx.sender_name }} to {{ sent_tx.receiver_name }}</p>
-        <p>Fee: {{ "{:,}".format(sent_tx.fee) }} sats</p>
+        <p>Fee: {{ "{:,}".format(sent_tx.fee) }} sats ({{ format_usd(sent_tx.fee) }})</p>
         <p class="txid-small">TXID: {{ sent_tx.txid }}</p>
         <p>Status: Pending confirmation</p>
         <br>
@@ -926,44 +982,75 @@ const ericaAddress = "{{ erica.address }}";
 const latestTxId = "{{ latest_display_tx.txid if latest_display_tx else '' }}";
 const latestTxFee = "{{ latest_display_tx.fee if latest_display_tx else '' }}";
 const sentTxActive = "{{ 'true' if sent_tx else 'false' }}" === "true";
-const btcUsdPrice = {{ BTC_USD_PRICE if false else 80000 }};
-const satsPerBtc = 100000000;
+const btcUsdPrice = {{ btc_usd_price }};
+const satsPerBtc = {{ sats_per_btc }};
+
+function formatSats(sats) {
+    return Math.round(Number(sats)).toLocaleString();
+}
+
+function satsToUsd(sats) {
+    return (Number(sats) / satsPerBtc) * btcUsdPrice;
+}
 
 function satsToUsdText(sats) {
-    const amount = Number(sats);
-    if (!amount || amount <= 0) return "";
-    const usd = (amount / satsPerBtc) * btcUsdPrice;
+    const usd = satsToUsd(sats);
     return `$${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function updateNeilSendDollarPreview() {
-    const input = document.getElementById('amountInput');
-    const preview = document.getElementById('neilDollarPreview');
-    const button = document.getElementById('neilSendSubmitBtn');
-    const sats = input ? Number(input.value) : 0;
-    const usdText = satsToUsdText(sats);
-
-    if (preview) {
-        preview.innerText = usdText ? `${sats.toLocaleString()} sats (${usdText})` : "Enter sats to see dollar amount";
-    }
-    if (button) {
-        button.innerText = usdText ? `Send ${sats.toLocaleString()} sats (${usdText})` : "Send Fake Transaction";
-    }
+function satsToBtcText(sats) {
+    const btc = Number(sats) / satsPerBtc;
+    return `${btc.toFixed(8).replace(/0+$/, '').replace(/\.$/, '') || '0'} BTC`;
 }
 
-function updateSendBackDollarPreview() {
-    const input = document.getElementById('sendBackAmount');
-    const preview = document.getElementById('sendBackDollarPreview');
-    const button = document.getElementById('sendBackSubmitBtn');
-    const sats = input ? Number(input.value) : 0;
-    const usdText = satsToUsdText(sats);
+function convertEnteredAmountToSats(displayValue, unit) {
+    const value = Number(displayValue);
+    if (!value || value <= 0) return 0;
 
-    if (preview) {
-        preview.innerText = usdText ? `${sats.toLocaleString()} sats (${usdText})` : "Enter sats to see dollar amount";
+    if (unit === 'btc') return Math.round(value * satsPerBtc);
+    if (unit === 'usd') return Math.round((value / btcUsdPrice) * satsPerBtc);
+    return Math.round(value);
+}
+
+function buildConversionHtml(sats) {
+    if (!sats || sats <= 0) {
+        return 'Enter an amount to see sats, BTC, and dollar value.';
     }
-    if (button) {
-        button.innerText = usdText ? `Send Back ${sats.toLocaleString()} sats (${usdText})` : "Send Back to Neil";
-    }
+
+    return `
+        <div><strong>Sats:</strong> ${formatSats(sats)} sats</div>
+        <div><strong>BTC:</strong> ${satsToBtcText(sats)}</div>
+        <div><strong>Dollar value:</strong> ${satsToUsdText(sats)}</div>
+        <div style="font-size:12px; margin-top:4px; opacity:.75;">Using fixed training price: $${btcUsdPrice.toLocaleString()} per BTC</div>
+    `;
+}
+
+function updateNeilSendAmountPreview() {
+    const displayInput = document.getElementById('amountInputDisplay');
+    const unitSelect = document.getElementById('neilSendUnit');
+    const hiddenSatsInput = document.getElementById('amountInput');
+    const preview = document.getElementById('neilConversionPreview');
+    const button = document.getElementById('neilSendSubmitBtn');
+
+    const sats = convertEnteredAmountToSats(displayInput ? displayInput.value : 0, unitSelect ? unitSelect.value : 'sats');
+
+    if (hiddenSatsInput) hiddenSatsInput.value = sats > 0 ? sats : '';
+    if (preview) preview.innerHTML = buildConversionHtml(sats);
+    if (button) button.innerText = sats > 0 ? `Send ${formatSats(sats)} sats (${satsToUsdText(sats)})` : 'Send Fake Transaction';
+}
+
+function updateSendBackAmountPreview() {
+    const displayInput = document.getElementById('sendBackAmountDisplay');
+    const unitSelect = document.getElementById('sendBackUnit');
+    const hiddenSatsInput = document.getElementById('sendBackAmount');
+    const preview = document.getElementById('sendBackConversionPreview');
+    const button = document.getElementById('sendBackSubmitBtn');
+
+    const sats = convertEnteredAmountToSats(displayInput ? displayInput.value : 0, unitSelect ? unitSelect.value : 'sats');
+
+    if (hiddenSatsInput) hiddenSatsInput.value = sats > 0 ? sats : '';
+    if (preview) preview.innerHTML = buildConversionHtml(sats);
+    if (button) button.innerText = sats > 0 ? `Send Back ${formatSats(sats)} sats (${satsToUsdText(sats)})` : 'Send Back to Neil';
 }
 
 const latestReceiver = "{{ latest_display_tx.receiver_name if latest_display_tx else '' }}";
@@ -978,7 +1065,7 @@ function clearButtonHighlights() {
     const copy = document.getElementById('copyBtn');
     const send = document.getElementById('sendBtn');
     const paste = document.getElementById('pasteBtn');
-    const amount = document.getElementById('amountInput');
+    const amount = document.getElementById('amountInputDisplay');
     const ericaSend = document.getElementById('ericaSendBtn');
 
     if (receive) receive.classList.remove('pulse-button');
@@ -1015,7 +1102,7 @@ function highlightPaste() {
 
 function highlightAmount() {
     clearButtonHighlights();
-    const amount = document.getElementById('amountInput');
+    const amount = document.getElementById('amountInputDisplay');
     if (amount) amount.classList.add('pulse-button');
 }
 
@@ -1122,7 +1209,8 @@ function pasteAddress() {
 function simulateWrongAddress() {
     showSend();
     document.getElementById('receiver_address').value = 'bc1qwrongtrainingaddress000000000000000';
-    document.getElementById('amountInput').value = '5000';
+    document.getElementById('amountInputDisplay').value = '5000';
+    updateNeilSendAmountPreview();
     advanceGuide('Mistake simulation: click Send Fake Transaction to see a wrong-address error');
     clearButtonHighlights();
 }
@@ -1130,7 +1218,8 @@ function simulateWrongAddress() {
 function simulateTooMuch() {
     showSend();
     document.getElementById('receiver_address').value = ericaAddress;
-    document.getElementById('amountInput').value = '999999999';
+    document.getElementById('amountInputDisplay').value = '999999999';
+    updateNeilSendAmountPreview();
     advanceGuide('Mistake simulation: click Send Fake Transaction to see an insufficient-funds error');
     clearButtonHighlights();
 }
@@ -1215,8 +1304,8 @@ function watchConfirmation() {
 }
 
 window.addEventListener('load', () => {
-    updateNeilSendDollarPreview();
-    updateSendBackDollarPreview();
+    updateNeilSendAmountPreview();
+    updateSendBackAmountPreview();
     // Only show Step 1 if truly idle (no active or just-sent transaction)
     if (!latestTxId && !sentTxActive) {
         advanceGuide("Step 1: Tap Receive on Erica's wallet");
