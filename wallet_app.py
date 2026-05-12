@@ -767,7 +767,7 @@ TEMPLATE = """
                             </span>
                         </div>
                     {% endif %}
-                    <div class="label">Erica's Wallet</div>
+                    <div class="label"></div>
                     <div class="wallet-name">Erica</div>
                     <div class="balance-label">BTC balance</div>
                     <div class="balance">{{ "{:,}".format(erica.balance) }} sats</div>
@@ -833,7 +833,7 @@ TEMPLATE = """
                             </span>
                         </div>
                     {% endif %}
-                    <div class="label">Neil's Wallet</div>
+                    <div class="label"></div>
                     <div class="wallet-name">Neil</div>
                     <div class="balance-label">BTC balance</div>
                     <div class="balance">{{ "{:,}".format(neil.balance) }} sats</div>
