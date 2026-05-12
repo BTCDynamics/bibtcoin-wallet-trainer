@@ -807,7 +807,7 @@ TEMPLATE = """
 
     <details class="education-box" open>
         <summary>How Bitcoin Transactions Work</summary>
-        <p>Sending Bitcoin is similar to mailing a letter: before you can send it, you need the receiver's address (test commit).</p>
+        <p>Sending Bitcoin is similar to mailing a letter: before you can send it, you need the receiver's address.</p>
         <p>In the real world, the receiver usually shares their receive address by text message, email, QR code, or messaging app.</p>
         <p>In this trainer, you have the wallet create a receive address, then paste that address into the other wallet, enter an amount, and sends sats.</p>
         <ul>
