@@ -673,7 +673,8 @@ TEMPLATE = """
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 90px 20px 28px;
+            z-index: 5000;
         }
         .modal {
             background: white;
@@ -681,6 +682,9 @@ TEMPLATE = """
             padding: 24px;
             border-radius: 24px;
             max-width: 340px;
+            width: 100%;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
             text-align: center;
             box-shadow: 0 24px 80px rgba(0,0,0,0.35);
         }
