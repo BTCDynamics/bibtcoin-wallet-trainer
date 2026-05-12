@@ -8,6 +8,16 @@ from pathlib import Path
 
 APP_NAME = "Bitcoin Wallet Trainer"
 DB_PATH = Path("wallet_trainer.db")
+BTC_USD_PRICE = 80000
+SATS_PER_BTC = 100_000_000
+
+
+def sats_to_usd(sats):
+    return (sats / SATS_PER_BTC) * BTC_USD_PRICE
+
+
+def format_usd(sats):
+    return f"${sats_to_usd(sats):,.2f}"
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
@@ -129,6 +139,7 @@ def load_page(sent_tx=None):
         latest_tx=latest_tx,
         latest_neil_tx=latest_neil_tx,
         latest_display_tx=latest_display_tx,
+        format_usd=format_usd,
     )
 
 
@@ -536,6 +547,18 @@ TEMPLATE = """
             margin-top: 4px;
             letter-spacing: -1px;
         }
+        .dollar-balance {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 4px;
+            opacity: .82;
+        }
+        .amount-preview {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1479e8;
+        }
         .actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -702,12 +725,12 @@ TEMPLATE = """
         <p>In the real world, the receiver usually shares their receive address by text message, email, QR code, or messaging app.</p>
         <p>In this trainer, you have the wallet create a receive address, then paste that address into the other wallet, enter an amount, and sends sats.</p>
         <ul>
-            <li>The receive address tells the wallet where to send the sats.</li>
+            <li>The receive address tells the sending wallet where to send the sats.</li>
             <li>The transaction starts as pending confirmation.</li>
             <li>Confirmations show the network has accepted the transaction.</li>
         </ul>
 
-        <p>In the real world, people use Bitcoin wallets such as Blockstream Green, Aqua Wallet, Nunchuk, Blitz, and many others to send and receive sats.</p>
+        <p>In the real world, people use Bitcoin wallets such as Blockstream, Aqua Wallet, Nunchuk, Blitz, and many others to send and receive sats.</p>
     </details>
 
     <div id="guide" class="guide-bar">
@@ -730,7 +753,7 @@ TEMPLATE = """
                 <div class="wallet-card {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}highlight{% endif %}" id="ericaWallet">
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
                         <div class="incoming">
-                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats<br>
+                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats ({{ format_usd(latest_display_tx.amount) }})<br>
                             <span id="txStatus">
                                 {% if latest_display_tx.status == "confirmed" %}
                                     ✅ Confirmed · {{ latest_display_tx.confirmations }} conf.
@@ -744,8 +767,9 @@ TEMPLATE = """
                     <div class="wallet-name">Erica</div>
                     <div class="balance-label">BTC balance</div>
                     <div class="balance">{{ "{:,}".format(erica.balance) }} sats</div>
+                    <div class="dollar-balance">({{ format_usd(erica.balance) }})</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
-                        <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats</div>
+                        <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
                     {% endif %}
                 </div>
 
@@ -765,8 +789,9 @@ TEMPLATE = """
                                 <button type="button" class="light" onclick="pasteNeilAddress()">Paste</button>
                             </div>
                             <label>Amount in sats</label>
-                            <input id="sendBackAmount" name="amount" type="number" min="1" value="{{ latest_tx.amount }}" required>
-                            <button class="orange" style="width:100%; margin-top:14px;" type="submit">Send Back to Neil</button>
+                            <input id="sendBackAmount" name="amount" type="number" min="1" value="{{ latest_tx.amount }}" required oninput="updateSendBackDollarPreview()">
+                            <div id="sendBackDollarPreview" class="amount-preview">{{ "{:,}".format(latest_tx.amount) }} sats ({{ format_usd(latest_tx.amount) }})</div>
+                            <button id="sendBackSubmitBtn" class="orange" style="width:100%; margin-top:14px;" type="submit">Send Back to Neil</button>
                         </form>
                     {% else %}
                         <p>For this beginner lesson, Erica receives first. After Neil sends sats to Erica, this button will let Erica send sats back.</p>
@@ -794,7 +819,7 @@ TEMPLATE = """
                 <div class="wallet-card send" id="neilWallet">
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
                         <div class="incoming">
-                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats<br>
+                            Incoming transaction: +{{ "{:,}".format(latest_display_tx.amount) }} sats ({{ format_usd(latest_display_tx.amount) }})<br>
                             <span id="txStatus">
                                 {% if latest_display_tx.status == "confirmed" %}
                                     ✅ Confirmed · {{ latest_display_tx.confirmations }} conf.
@@ -808,8 +833,9 @@ TEMPLATE = """
                     <div class="wallet-name">Neil</div>
                     <div class="balance-label">BTC balance</div>
                     <div class="balance">{{ "{:,}".format(neil.balance) }} sats</div>
+                    <div class="dollar-balance">({{ format_usd(neil.balance) }})</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
-                        <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats</div>
+                        <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
                     {% endif %}
                 </div>
 
@@ -838,9 +864,10 @@ TEMPLATE = """
                         </div>
 
                         <label>Amount in sats</label>
-                        <input id="amountInput" name="amount" type="number" min="1" placeholder="Example: 5000" required>
+                        <input id="amountInput" name="amount" type="number" min="1" placeholder="Example: 5000" required oninput="updateNeilSendDollarPreview()">
+                        <div id="neilDollarPreview" class="amount-preview">Enter sats to see dollar amount</div>
 
-                        <button class="blue" style="width:100%; margin-top:14px;" type="submit">
+                        <button id="neilSendSubmitBtn" class="blue" style="width:100%; margin-top:14px;" type="submit">
                             Send Fake Transaction
                         </button>
                     </form>
@@ -862,7 +889,7 @@ TEMPLATE = """
             <div class="tx-item">
                 <div class="tx-main">
                     <span>{{ tx.sender_name }} → {{ tx.receiver_name }}</span>
-                    <span>{{ "{:,}".format(tx.amount) }} sats</span>
+                    <span>{{ "{:,}".format(tx.amount) }} sats ({{ format_usd(tx.amount) }})</span>
                 </div>
                 <div class="tx-sub" id="activityStatus-{{ tx.txid }}">Fee: {{ "{:,}".format(tx.fee) }} sats · {{ tx.status }} · {{ tx.confirmations }} conf.</div>
                 <div class="txid">{{ tx.txid }}</div>
@@ -879,7 +906,7 @@ TEMPLATE = """
 <div class="modal-backdrop">
     <div class="modal">
         <h2>Transaction Sent</h2>
-        <p><strong>{{ "{:,}".format(sent_tx.amount) }} sats</strong></p>
+        <p><strong>{{ "{:,}".format(sent_tx.amount) }} sats ({{ format_usd(sent_tx.amount) }})</strong></p>
         <p>From {{ sent_tx.sender_name }} to {{ sent_tx.receiver_name }}</p>
         <p>Fee: {{ "{:,}".format(sent_tx.fee) }} sats</p>
         <p class="txid-small">TXID: {{ sent_tx.txid }}</p>
@@ -895,6 +922,46 @@ const ericaAddress = "{{ erica.address }}";
 const latestTxId = "{{ latest_display_tx.txid if latest_display_tx else '' }}";
 const latestTxFee = "{{ latest_display_tx.fee if latest_display_tx else '' }}";
 const sentTxActive = "{{ 'true' if sent_tx else 'false' }}" === "true";
+const btcUsdPrice = {{ BTC_USD_PRICE if false else 80000 }};
+const satsPerBtc = 100000000;
+
+function satsToUsdText(sats) {
+    const amount = Number(sats);
+    if (!amount || amount <= 0) return "";
+    const usd = (amount / satsPerBtc) * btcUsdPrice;
+    return `$${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function updateNeilSendDollarPreview() {
+    const input = document.getElementById('amountInput');
+    const preview = document.getElementById('neilDollarPreview');
+    const button = document.getElementById('neilSendSubmitBtn');
+    const sats = input ? Number(input.value) : 0;
+    const usdText = satsToUsdText(sats);
+
+    if (preview) {
+        preview.innerText = usdText ? `${sats.toLocaleString()} sats (${usdText})` : "Enter sats to see dollar amount";
+    }
+    if (button) {
+        button.innerText = usdText ? `Send ${sats.toLocaleString()} sats (${usdText})` : "Send Fake Transaction";
+    }
+}
+
+function updateSendBackDollarPreview() {
+    const input = document.getElementById('sendBackAmount');
+    const preview = document.getElementById('sendBackDollarPreview');
+    const button = document.getElementById('sendBackSubmitBtn');
+    const sats = input ? Number(input.value) : 0;
+    const usdText = satsToUsdText(sats);
+
+    if (preview) {
+        preview.innerText = usdText ? `${sats.toLocaleString()} sats (${usdText})` : "Enter sats to see dollar amount";
+    }
+    if (button) {
+        button.innerText = usdText ? `Send Back ${sats.toLocaleString()} sats (${usdText})` : "Send Back to Neil";
+    }
+}
+
 const latestReceiver = "{{ latest_display_tx.receiver_name if latest_display_tx else '' }}";
 
 function advanceGuide(stepText) {
@@ -1144,6 +1211,8 @@ function watchConfirmation() {
 }
 
 window.addEventListener('load', () => {
+    updateNeilSendDollarPreview();
+    updateSendBackDollarPreview();
     // Only show Step 1 if truly idle (no active or just-sent transaction)
     if (!latestTxId && !sentTxActive) {
         advanceGuide("Step 1: Tap Receive on Erica's wallet");
