@@ -834,12 +834,12 @@ TEMPLATE = """
                             </div>
                             <label>Send amount</label>
                             <div class="unit-row">
-                                <select id="sendBackUnit" onchange="updateSendBackAmountPreview()">
+                                <select id="sendBackUnit" onchange="handleSendBackUnitChange()">
                                     <option value="sats" selected>sats</option>
                                     <option value="btc">BTC</option>
                                     <option value="usd">USD</option>
                                 </select>
-                                <input id="sendBackAmountDisplay" type="number" min="0" step="any" value="{{ latest_tx.amount }}" required oninput="updateSendBackAmountPreview()">
+                                <input id="sendBackAmountDisplay" type="number" min="0" step="any" value="{{ latest_tx.amount }}" placeholder="Example: 5000" required oninput="updateSendBackAmountPreview()">
                             </div>
                             <input id="sendBackAmount" name="amount" type="hidden" value="{{ latest_tx.amount }}">
                             <div id="sendBackConversionPreview" class="conversion-box"></div>
@@ -917,7 +917,7 @@ TEMPLATE = """
 
                         <label>Send amount</label>
                         <div class="unit-row">
-                            <select id="neilSendUnit" onchange="updateNeilSendAmountPreview()">
+                            <select id="neilSendUnit" onchange="handleNeilSendUnitChange()">
                                 <option value="sats" selected>sats</option>
                                 <option value="btc">BTC</option>
                                 <option value="usd">USD</option>
@@ -1023,6 +1023,40 @@ function buildConversionHtml(sats) {
         <div><strong>Dollar value:</strong> ${satsToUsdText(sats)}</div>
         <div style="font-size:12px; margin-top:4px; opacity:.75;">Using fixed training price: $${btcUsdPrice.toLocaleString()} per BTC</div>
     `;
+}
+
+
+function getAmountPlaceholder(unit) {
+    if (unit === 'btc') return 'Example: 0.001';
+    if (unit === 'usd') return 'Example: 80';
+    return 'Example: 5000';
+}
+
+function updateAmountPlaceholder(inputId, unit) {
+    const input = document.getElementById(inputId);
+    if (input) input.placeholder = getAmountPlaceholder(unit);
+}
+
+function handleNeilSendUnitChange() {
+    const unitSelect = document.getElementById('neilSendUnit');
+    const displayInput = document.getElementById('amountInputDisplay');
+    const hiddenSatsInput = document.getElementById('amountInput');
+
+    updateAmountPlaceholder('amountInputDisplay', unitSelect ? unitSelect.value : 'sats');
+    if (displayInput) displayInput.value = '';
+    if (hiddenSatsInput) hiddenSatsInput.value = '';
+    updateNeilSendAmountPreview();
+}
+
+function handleSendBackUnitChange() {
+    const unitSelect = document.getElementById('sendBackUnit');
+    const displayInput = document.getElementById('sendBackAmountDisplay');
+    const hiddenSatsInput = document.getElementById('sendBackAmount');
+
+    updateAmountPlaceholder('sendBackAmountDisplay', unitSelect ? unitSelect.value : 'sats');
+    if (displayInput) displayInput.value = '';
+    if (hiddenSatsInput) hiddenSatsInput.value = '';
+    updateSendBackAmountPreview();
 }
 
 function updateNeilSendAmountPreview() {
@@ -1304,6 +1338,10 @@ function watchConfirmation() {
 }
 
 window.addEventListener('load', () => {
+    const neilUnit = document.getElementById('neilSendUnit');
+    const sendBackUnit = document.getElementById('sendBackUnit');
+    updateAmountPlaceholder('amountInputDisplay', neilUnit ? neilUnit.value : 'sats');
+    updateAmountPlaceholder('sendBackAmountDisplay', sendBackUnit ? sendBackUnit.value : 'sats');
     updateNeilSendAmountPreview();
     updateSendBackAmountPreview();
     // Only show Step 1 if truly idle (no active or just-sent transaction)
