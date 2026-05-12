@@ -1,7 +1,7 @@
 from flask import Flask, render_template_string, request, redirect, url_for, flash, Response
 import sqlite3
 import secrets
-import time 
+import time
 import io
 import qrcode
 from pathlib import Path
@@ -599,6 +599,12 @@ TEMPLATE = """
             margin-top: 4px;
             opacity: .82;
         }
+        .usd-balance {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 2px;
+            opacity: .72;
+        }
         .amount-preview {
             margin-top: 8px;
             font-size: 14px;
@@ -853,7 +859,14 @@ TEMPLATE = """
                     <div class="wallet-name">Erica</div>
                     <div class="balance-label">Total BTC balance</div>
                     <div class="balance">{{ "{:,}".format(erica.balance) }} sats</div>
-                    <div class="dollar-balance">{{ format_btc(erica.balance) }} ({{ format_usd(erica.balance) }})</div>
+
+                    <div class="dollar-balance">
+                        {{ format_btc(erica.balance) }}
+                    </div>
+
+                    <div class="usd-balance">
+                        {{ format_usd(erica.balance) }}
+                    </div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
                     {% endif %}
@@ -927,7 +940,14 @@ TEMPLATE = """
                     <div class="wallet-name">Neil</div>
                     <div class="balance-label">Total BTC balance</div>
                     <div class="balance">{{ "{:,}".format(neil.balance) }} sats</div>
-                    <div class="dollar-balance">{{ format_btc(neil.balance) }} ({{ format_usd(neil.balance) }})</div>
+
+                    <div class="dollar-balance">
+                        {{ format_btc(neil.balance) }}
+                    </div>
+
+                    <div class="usd-balance">
+                        {{ format_usd(neil.balance) }}
+                    </div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
                     {% endif %}
