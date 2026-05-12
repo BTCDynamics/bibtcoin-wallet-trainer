@@ -865,7 +865,7 @@ TEMPLATE = """
                     </div>
 
                     <div class="usd-balance">
-                        {{ format_usd(erica.balance) }}
+                        ({{ format_usd(erica.balance) }})
                     </div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
@@ -946,7 +946,7 @@ TEMPLATE = """
                     </div>
 
                     <div class="usd-balance">
-                        {{ format_usd(neil.balance) }}
+                        ({{ format_usd(neil.balance) }})
                     </div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
                         <div id="satsPop" class="sats-pop hidden">+{{ "{:,}".format(latest_display_tx.amount) }} sats<br><span style="font-size:15px;">({{ format_usd(latest_display_tx.amount) }})</span></div>
