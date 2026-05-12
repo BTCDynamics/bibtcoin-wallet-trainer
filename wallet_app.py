@@ -769,7 +769,7 @@ TEMPLATE = """
                     {% endif %}
                     <div class="label">BTC Wallet</div>
                     <div class="wallet-name">Erica</div>
-                    <div class="balance-label">BTC balance</div>
+                    <div class="balance-label">Total BTC balance</div>
                     <div class="balance">{{ "{:,}".format(erica.balance) }} sats</div>
                     <div class="dollar-balance">({{ format_usd(erica.balance) }})</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Erica' %}
@@ -835,7 +835,7 @@ TEMPLATE = """
                     {% endif %}
                     <div class="label">BTC Wallet</div>
                     <div class="wallet-name">Neil</div>
-                    <div class="balance-label">BTC balance</div>
+                    <div class="balance-label">Total BTC balance</div>
                     <div class="balance">{{ "{:,}".format(neil.balance) }} sats</div>
                     <div class="dollar-balance">({{ format_usd(neil.balance) }})</div>
                     {% if latest_display_tx and latest_display_tx.receiver_name == 'Neil' %}
